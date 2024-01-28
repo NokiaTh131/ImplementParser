@@ -1,5 +1,6 @@
 
 import Component.ConfigurationReader;
+import Component.Player;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -27,7 +28,7 @@ public class Main {
             String constructionPlan = constructionPlanReader.code();
 
             ExprTokenizer tokenizer = new ExprTokenizer(constructionPlan);
-            ExprParser parser = new ExprParser(tokenizer);
+            ExprParser parser = new ExprParser(tokenizer,new land(),new Player());
             Expr result = parser.parsePlan();
 
             // Evaluate the parsed expression with the given bindings

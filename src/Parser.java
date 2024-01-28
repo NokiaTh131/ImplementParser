@@ -1,3 +1,5 @@
+import Component.Player;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +25,12 @@ interface Parser {
 class ExprParser implements Parser {
 
     private ExprTokenizer tkz;
-    public ExprParser(ExprTokenizer tkz) {
+    private land l;
+    private Player p;
+    public ExprParser(ExprTokenizer tkz, land l, Player p) {
         this.tkz = tkz;
+        this.l = l;
+        this.p = p;
     }
 
 

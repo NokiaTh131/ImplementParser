@@ -31,30 +31,44 @@ class ActionCommands implements Command {
         c.setCitycenter(true);
     }
 
-    public void move(Direction direction, CityCrew cityCrew) {
+    public void move(Direction direction, Player p , land w) {
         switch (direction) {
             case UP:
-                cityCrew.moveUp();
+                p.getCityCrew().moveUp();
+                if(p.getCityCrew().getPlayer_Id() != w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id()
+                        && w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id() != 0) p.getCityCrew().moveDown();
                 break;
             case UPLEFT:
-                cityCrew.moveUpLeft();
+                p.getCityCrew().moveUpLeft();
+                if(p.getCityCrew().getPlayer_Id() != w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id()
+                        && w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id() != 0) p.getCityCrew().moveDownRight();
                 break;
             case UPRIGHT:
-                cityCrew.moveUpRight();
+                p.getCityCrew().moveUpRight();
+                if(p.getCityCrew().getPlayer_Id() != w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id()
+                        && w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id() != 0) p.getCityCrew().moveDownLeft();
                 break;
             case DOWNRIGHT:
-                cityCrew.moveDownRight();
+                p.getCityCrew().moveDownRight();
+                if(p.getCityCrew().getPlayer_Id() != w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id()
+                        && w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id() != 0) p.getCityCrew().moveUpLeft();
                 break;
             case DOWN:
-                cityCrew.moveDown();
+                p.getCityCrew().moveDown();
+                if(p.getCityCrew().getPlayer_Id() != w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id()
+                        && w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id() != 0) p.getCityCrew().moveUp();
                 break;
             case DOWNLEFT:
-                cityCrew.moveDownLeft();
+                p.getCityCrew().moveDownLeft();
+                if(p.getCityCrew().getPlayer_Id() != w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id()
+                        && w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id() != 0) p.getCityCrew().moveUpRight();
                 break;
             default:
                 System.out.println("Invalid direction: " + direction);
         }
+
     }
+
 
 
 

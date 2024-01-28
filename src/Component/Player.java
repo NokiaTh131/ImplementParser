@@ -53,5 +53,9 @@ public class Player {
     public void setBudget(int budget) {
         this.budget = budget;
     }
+
+    public CityCrew getCityCrew() {
+        return cityCrew;
+    }
 }
 
