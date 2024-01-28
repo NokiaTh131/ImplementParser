@@ -9,12 +9,14 @@ public class Player {
     private int citycenCol = -1;
     private Cell c;
     private int budget;
+    private CityCrew cityCrew;
 
     public Player(String name, int id) throws IOException {
         ConfigurationReader r = new ConfigurationReader();
         this.name = name;
         this.id = id;
         this.budget = (int) r.initBudget();
+        this.cityCrew = new CityCrew(-1,-1,this);
     }
     public Player() throws IOException {
         this("N/A",0);
@@ -53,6 +55,3 @@ public class Player {
     }
 }
 
-class CityCrew {
-
-}

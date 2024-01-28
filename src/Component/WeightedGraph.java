@@ -27,6 +27,7 @@ public class WeightedGraph {
             return;
         }
         adjacencyMatrix[row][col] = new Cell(p,deposit,row,col);
+
     }
 
     public void printOwner(Player p) {

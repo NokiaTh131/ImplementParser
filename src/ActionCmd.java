@@ -1,4 +1,5 @@
 import Component.Cell;
+import Component.CityCrew;
 import Component.Player;
 import Component.WeightedGraph;
 
@@ -14,6 +15,7 @@ public interface ActionCmd extends Command{
 }
 
 class ActionCommands implements Command {
+
     public void done() {
 
     }
@@ -28,6 +30,33 @@ class ActionCommands implements Command {
         p.setBudget(p.getBudget() - (5*x+10));
         c.setCitycenter(true);
     }
+
+    public void move(Direction direction, CityCrew cityCrew) {
+        switch (direction) {
+            case UP:
+                cityCrew.moveUp();
+                break;
+            case UPLEFT:
+                cityCrew.moveUpLeft();
+                break;
+            case UPRIGHT:
+                cityCrew.moveUpRight();
+                break;
+            case DOWNRIGHT:
+                cityCrew.moveDownRight();
+                break;
+            case DOWN:
+                cityCrew.moveDown();
+                break;
+            case DOWNLEFT:
+                cityCrew.moveDownLeft();
+                break;
+            default:
+                System.out.println("Invalid direction: " + direction);
+        }
+    }
+
+
 
     public static void main(String[] args) throws IOException {
         WeightedGraph w = new WeightedGraph(8,8);
