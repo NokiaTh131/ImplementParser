@@ -57,5 +57,13 @@ public class Player {
     public CityCrew getCityCrew() {
         return cityCrew;
     }
+    public void setCityCenter(Cell c) {
+        c.setCitycenter(true);
+    }
+
+    public void setCityCrewLoc(int row,int col) {
+        this.cityCrew.setCurrentRow(row);
+        this.cityCrew.setCurrentCol(col);
+    }
 }
 

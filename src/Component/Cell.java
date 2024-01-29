@@ -38,6 +38,10 @@ public class Cell{
 
     }
 
+    public void setDeposit(int deposit) {
+        this.deposit = deposit;
+    }
+
     public boolean isCitycenter() {
         return isCitycenter;
     }
@@ -49,7 +53,13 @@ public class Cell{
         return (int)col;
     }
 
+    public void setP(Player p) {
+        this.p = p;
+    }
 
+    public Player getP() {
+        return p;
+    }
 
     public static void main(String[] args) throws IOException {
         WeightedGraph w = new WeightedGraph(6,5);

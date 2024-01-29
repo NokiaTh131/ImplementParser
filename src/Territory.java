@@ -3,6 +3,7 @@ import Component.ConfigurationReader;
 import Component.Player;
 import Component.WeightedGraph;
 import java.io.IOException;
+import java.util.List;
 
 
 public interface Territory {
@@ -12,9 +13,11 @@ public interface Territory {
 class land implements Territory {
     ConfigurationReader c;
     WeightedGraph map;
-    public land() throws IOException {
+    List<Player> players;
+    public land(List<Player> players) throws IOException {
         c = new ConfigurationReader();
         map = new WeightedGraph(c.m(),c.n());
+        this.players = players;
     }
 
     @Override
@@ -33,4 +36,9 @@ class land implements Territory {
     public void printOwner(Player p) {
         map.printOwner(p);
     }
+
+    public int getIndexOfPlayer(Player p, List<Player> playerList) {
+        return playerList.indexOf(p);
+    }
+
 }

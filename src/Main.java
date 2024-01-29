@@ -3,7 +3,9 @@ import Component.ConfigurationReader;
 import Component.Player;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Main {
@@ -28,7 +30,8 @@ public class Main {
             String constructionPlan = constructionPlanReader.code();
 
             ExprTokenizer tokenizer = new ExprTokenizer(constructionPlan);
-            ExprParser parser = new ExprParser(tokenizer,new land(),new Player());
+            List<Player> p = new ArrayList<>();
+            ExprParser parser = new ExprParser(tokenizer,new land(p),new Player());
             Expr result = parser.parsePlan();
 
             // Evaluate the parsed expression with the given bindings
