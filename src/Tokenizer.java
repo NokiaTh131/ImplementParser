@@ -83,7 +83,7 @@ class ExprTokenizer implements Tokenizer {
                 s.append(src.charAt(pos));
             }
         } else if (c == '#') {  // comment, ignore everything until the end of the line
-            for (pos++; pos < src.length() && src.charAt(pos) != '\n'; pos++)
+            for (pos++; pos < src.length() && src.charAt(pos) != '\0'; pos++)
                 ;  // skip characters
             computeNext();  // recurse to find the next token after the comment
             return;
@@ -137,19 +137,6 @@ class ExprTokenizer implements Tokenizer {
         return Character.isWhitespace(c);
     }
 
-
-
-//    public static void main(String[] args) throws IOException {
-//
-//        ConstructionPlanReader r = new ConstructionPlanReader();
-//        ExprTokenizer tokenizer = new ExprTokenizer(r.code());
-//
-//        while (tokenizer.hasNextToken()) {
-//            tokenizer.computeNext();
-//            System.out.println(tokenizer.peek());
-//        }
-//
-//    }
 
 
 }

@@ -1,7 +1,3 @@
-package Component;
-
-import java.io.IOException;
-
 public class CityCrew {
     private int currentRow;
     private int currentCol;

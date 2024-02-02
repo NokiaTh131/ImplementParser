@@ -1,6 +1,7 @@
-package Component;
-
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 public class Player {
     private String name;
@@ -8,15 +9,33 @@ public class Player {
     private int citycenRow = -1;
     private int citycenCol = -1;
     private Cell c;
-    private int budget;
     private CityCrew cityCrew;
+    public Map<String, Integer> bindings = new HashMap<>();
+    private Variable t = new Variable("t");
+    private Variable d = new Variable("deposit");
+    private Variable b = new Variable("budget");
+    private Variable m = new Variable("m");
+    private Variable loc = new Variable("opponentLoc");
+    private Variable cost = new Variable("cost");
+    private Variable dir = new Variable("dir");
+    private Variable random = new Variable("random");
 
     public Player(String name, int id) throws IOException {
         ConfigurationReader r = new ConfigurationReader();
         this.name = name;
         this.id = id;
-        this.budget = (int) r.initBudget();
+        bindings.put("budget",(int) r.initBudget());
         this.cityCrew = new CityCrew(-1,-1,this);
+        bindings.put("t", 1);
+        bindings.put("deposit",1000);
+        bindings.put("m", 0);
+        bindings.put("opponentLoc", 0);
+        bindings.put("cost", 0);
+        bindings.put("dir", 0);
+
+        Random rand = new Random();
+        int randomValue = rand.nextInt(1000);
+        bindings.put("random",randomValue );
     }
     public Player() throws IOException {
         this("N/A",0);
@@ -47,11 +66,11 @@ public class Player {
     }
 
     public int getBudget() {
-        return budget;
+        return bindings.get("budget");
     }
 
     public void setBudget(int budget) {
-        this.budget = budget;
+        bindings.put("budget",budget);
     }
 
     public CityCrew getCityCrew() {

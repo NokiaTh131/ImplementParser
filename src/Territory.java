@@ -1,13 +1,11 @@
-import Component.Cell;
-import Component.ConfigurationReader;
-import Component.Player;
-import Component.WeightedGraph;
 import java.io.IOException;
 import java.util.List;
 
 
 public interface Territory {
     void buyCity(int row, int col, Player p, int deposit);
+    Cell getCell(int row, int col);
+    int getIndexOfPlayer(Player p, List<Player> playerList);
 }
 
 class land implements Territory {
@@ -23,6 +21,8 @@ class land implements Territory {
     @Override
     public void buyCity(int row, int col, Player p, int deposit) {
         map.addEdge(row,col,p,deposit);
+        p.setCityCenter(this.getCell(row,col));
+        p.setCityCrewLoc(row,col);
     }
 
     public void printMatrix() {

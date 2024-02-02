@@ -1,48 +1,54 @@
-
-import Component.ConfigurationReader;
-import Component.Player;
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        try {
-            ConfigurationReader configReader = new ConfigurationReader();
+    public static void main(String[] args) throws IOException, Parser.SyntaxError, EvalError, ActionCmd.ParsingInterruptedException {
 
-            Map<String, Integer> bindings = new HashMap<>();
-            bindings.put("m", (int) configReader.m());
-            bindings.put("n", (int) configReader.n());
-            bindings.put("init_plan_min", (int) configReader.initPlanMin());
-            bindings.put("init_plan_sec", (int) configReader.initPlanSec());
-            bindings.put("init_budget", (int) configReader.initBudget());
-            bindings.put("init_center_dep", (int) configReader.initCenterDep());
-            bindings.put("plan_rev_min", (int) configReader.planRevMin());
-            bindings.put("plan_rev_sec", (int) configReader.planRevSec());
-            bindings.put("rev_cost", (int) configReader.revCost());
-            bindings.put("max_dep", (int) configReader.maxDep());
-            bindings.put("interest_pct", (int) configReader.interestPct());
+        List<Player> players = new ArrayList<>();
+        Player p = new Player("John",11);
+        Player p2 = new Player("Jesse",12);
+        players.add(p);players.add(p2);
+        land l = new land(players);
+        l.buyCity(3,2,p,1000);
+        l.buyCity(4,2,p2,900);
 
-            ConstructionPlanReader constructionPlanReader = new ConstructionPlanReader();
-            String constructionPlan = constructionPlanReader.code();
 
-            ExprTokenizer tokenizer = new ExprTokenizer(constructionPlan);
-            List<Player> p = new ArrayList<>();
-            ExprParser parser = new ExprParser(tokenizer,new land(p),new Player());
-            Expr result = parser.parsePlan();
+        ConstructionPlanReader constructionPlanReader = new ConstructionPlanReader();
+        String constructionPlan = constructionPlanReader.read("src/constructionplan2.txt");
 
-            // Evaluate the parsed expression with the given bindings
-            int evaluationResult = result.eval(bindings);
+        ExprTokenizer tokenizer = new ExprTokenizer(constructionPlan);
+        ExprParser parser = new ExprParser(tokenizer,l,p);
+        List<Expr> result = parser.parsePlan();
 
-            // Print the result
-            System.out.println("Evaluation Result: " + evaluationResult);
-
-        } catch (IOException | Parser.SyntaxError | EvalError e) {
-            e.printStackTrace();
-            // Handle the exceptions appropriately
+        try{
+            for (Expr statement : result) {
+                statement.eval(p.bindings);
+            }
+        }catch (ActionCmd.ParsingInterruptedException e) {
+            System.out.println("turn end.");
         }
+
+        System.out.println("!!parse complete!...");
+        l.printMatrix();
+        l.printOwner(p);
+        l.printOwner(p2);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }

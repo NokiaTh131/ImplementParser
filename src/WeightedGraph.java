@@ -1,6 +1,4 @@
-package Component;
 import java.io.IOException;
-import java.util.*;
 
 //this is direct weighted graph
 public class WeightedGraph {
@@ -21,7 +19,7 @@ public class WeightedGraph {
         }
     }
 
-    public void addEdge(int row, int col, Player p,int deposit) {
+    public void addEdge(int row, int col, Player p, int deposit) {
         if(deposit <= 0) {
             System.out.println("fail to buy this Cell.");
             return;

@@ -1,14 +1,15 @@
-import Component.WeightedGraph;
-
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 interface Node {
-    void prettyPrint(StringBuilder s);
+    void prettyPrint(StringBuilder s) throws EvalError;
 }
 
 interface Expr extends Node {
-    int eval(Map<String, Integer> bindings) throws EvalError;
+    ActionCommands a = new ActionCommands();
+    InfoCommand info = new InfoCommand();
+    int eval(Map<String, Integer> bindings) throws EvalError, IOException, ActionCmd.ParsingInterruptedException;
 }
 
 class EvalError extends Throwable {
@@ -38,7 +39,7 @@ record Variable(String name) implements Expr {
 
 
 record BinaryArithExpr(Expr left, String op, Expr right) implements Expr {
-    public int eval(Map<String, Integer> bindings) throws EvalError {
+    public int eval(Map<String, Integer> bindings) throws EvalError, IOException, ActionCmd.ParsingInterruptedException {
         int lv = left.eval(bindings);
         int rv = right.eval(bindings);
         if (op.equals("+")) return lv + rv;
@@ -49,7 +50,7 @@ record BinaryArithExpr(Expr left, String op, Expr right) implements Expr {
         if (op.equals("^")) return (int) Math.pow(lv,rv);
         throw new EvalError("unknown op: " + op);
     }
-    public void prettyPrint(StringBuilder s) {
+    public void prettyPrint(StringBuilder s) throws EvalError {
         s.append("(");
         left.prettyPrint(s);
         s.append(op);
@@ -69,45 +70,34 @@ record BinaryArithExpr(Expr left, String op, Expr right) implements Expr {
 //    }
 //}
 
-class OpponentInfoExpr implements Expr {
-    public int eval(Map<String, Integer> bindings) throws EvalError {
-        return 1;
+record OpponentInfoExpr(Player p,land l) implements Expr {
+    public int eval(Map<String, Integer> bindings) throws EvalError, IOException {
+        return info.opponent(p,l);
     }
     public void prettyPrint(StringBuilder s) {
         s.append("opponent");
     }
 }
 
-record NearbyInfoExpr(Direction direction) implements Expr {
-    public int eval(Map<String, Integer> bindings) throws EvalError {
-        return 1;
+record NearbyInfoExpr(Direction direction,Player p,land l) implements Expr {
+    public int eval(Map<String, Integer> bindings) throws EvalError, IOException {
+        return info.nearby(direction,p,l);
     }
     public void prettyPrint(StringBuilder s) {
         s.append("nearby");
     }
 }
 
-class WhileStatement implements Expr {
-    private final Expr condition;
-    private final Expr body;
-
-    public WhileStatement(Expr condition, Expr body) {
-        this.condition = condition;
-        this.body = body;
+record WhileStatement(Expr condition, Expr body) implements Expr {
+    public int eval(Map<String, Integer> bindings) throws EvalError, IOException, ActionCmd.ParsingInterruptedException {
+        int result = 0;
+        for (int c = 0; c < 10000 && condition.eval(bindings) > 0;c++) {
+            result = body.eval(bindings);
+        }
+        return result;
     }
 
-    @Override
-    public int eval(Map<String, Integer> bindings) throws EvalError {
-//        int counter = 0;
-//        while (condition.eval(bindings) > 0 && counter < 10000) {
-//            body.eval(bindings);
-//            counter++;
-//        }
-        return 0; // Placeholder value
-    }
-
-    @Override
-    public void prettyPrint(StringBuilder s) {
+    public void prettyPrint(StringBuilder s) throws EvalError {
         s.append("while (");
         condition.prettyPrint(s);
         s.append(") ");
@@ -115,33 +105,74 @@ class WhileStatement implements Expr {
     }
 }
 
+record ActionCommand(String cmd,Player p,land l) implements Expr {
+    public int eval(Map<String, Integer> bindings) throws EvalError, IOException, ActionCmd.ParsingInterruptedException {
+            if (cmd.equals("done")) {
+                System.out.println("done was do");
+                a.done();
+                return 1;
+            } else if (cmd.equals("relocate")) {
+                a.relocate(l.getCell(p.getCityCrew().getCurrentRow(), p.getCityCrew().getCurrentCol()), p);
+                a.done();
+                return 2;
+            }
+
+        return 0;
+    }
+
+    public void prettyPrint(StringBuilder s) throws EvalError {
+        if (cmd.equals("done")) {
+            s.append("done");
+        } else if (cmd.equals("relocate")) {
+            s.append("relocate");
+        }else{
+            throw new EvalError("Invalid region command: " + cmd);
+        }
+    }
+}
+
 
 record IfStatement(Expr condition, Expr thenBranch,Expr elseBranch) implements Expr {
-    public int eval(Map<String, Integer> bindings) throws EvalError {
-        return 1;
+    public int eval(Map<String, Integer> bindings) throws EvalError, IOException, ActionCmd.ParsingInterruptedException {
+        int conditionValue = condition.eval(bindings);
+        if (conditionValue > 0) {
+            return thenBranch.eval(bindings);
+        } else {
+            return elseBranch.eval(bindings);
+        }
     }
-    public void prettyPrint(StringBuilder s) {
-        s.append("if");
-        s.append("(");
-        s.append(condition);
-        s.append(")");
-        s.append(thenBranch);
-    }
-}
-
-record AttackCommand(Direction direction,Expr expression) implements Expr {
-    public int eval(Map<String, Integer> bindings) throws EvalError {
-        return 1;
-    }
-    public void prettyPrint(StringBuilder s) {
-        s.append("shoot");
-
+    public void prettyPrint(StringBuilder s) throws EvalError {
+        s.append("if (");
+        condition.prettyPrint(s);
+        s.append(") ");
+        thenBranch.prettyPrint(s);
+        s.append(" else ");
+        elseBranch.prettyPrint(s);
     }
 }
 
-record RegionCommand(String cmd,Expr expression) implements Expr {
-    public int eval(Map<String, Integer> bindings) throws EvalError {
+record AttackCommand(Direction direction,Expr expression,Player p,land l) implements Expr {
+
+    public int eval(Map<String, Integer> bindings) throws EvalError, IOException, ActionCmd.ParsingInterruptedException {
+        a.shoot(direction, expression.eval(bindings), p, l);
         return 1;
+    }
+    public void prettyPrint(StringBuilder s) {
+        s.append("shoot").append(direction);
+    }
+}
+
+record RegionCommand(String cmd,Expr expression,Player p, land l) implements Expr {
+    public int eval(Map<String, Integer> bindings) throws EvalError, IOException, ActionCmd.ParsingInterruptedException {
+        if(cmd.equals("invest")) {
+            a.invest(expression.eval(bindings), p, l.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()));
+            return 1;
+        } else if (cmd.equals("collect")) {
+            a.collect(expression.eval(bindings), p, l.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()));
+            return 2;
+        }else{
+            throw new EvalError("Invalid region command: " + cmd);
+        }
     }
     public void prettyPrint(StringBuilder s) {
         s.append(cmd);
@@ -149,33 +180,36 @@ record RegionCommand(String cmd,Expr expression) implements Expr {
     }
 }
 
-record MoveCommand(Direction direction) implements Expr {
-    public int eval(Map<String, Integer> bindings) throws EvalError {
+record MoveCommand(Direction direction, Player p, land l) implements Expr {
+    public int eval(Map<String, Integer> bindings) throws EvalError, ActionCmd.ParsingInterruptedException {
+        System.out.println("move was do");
+        a.move(direction,p,l);
+        bindings.put("deposit",l.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getDeposit());
         return 1;
     }
     public void prettyPrint(StringBuilder s) {
+        s.append("move");
         s.append(direction);
-
     }
 }
 
-record ActionCommand(String cmd) implements Expr {
-    public int eval(Map<String, Integer> bindings) throws EvalError {
-        return 1;
-    }
-    public void prettyPrint(StringBuilder s) {
-        s.append(cmd);
-
-    }
-}
 
 record AssignmentExpr(String identifier,Expr expression) implements Expr {
-    public int eval(Map<String, Integer> bindings) throws EvalError {
-        return 1;
+    public int eval(Map<String, Integer> bindings) throws EvalError, IOException, ActionCmd.ParsingInterruptedException {
+        if (expression != null) {
+            int value = expression.eval(bindings);
+            bindings.put(identifier, value);
+            return value;
+        } else {
+            throw new EvalError("Missing expression in assignment");
+        }
     }
-    public void prettyPrint(StringBuilder s) {
+    public void prettyPrint(StringBuilder s) throws EvalError {
         s.append(identifier);
-
+        if (expression != null) {
+            s.append(" = ");
+            expression.prettyPrint(s);
+        }
     }
 }
 
@@ -187,16 +221,16 @@ class BlockStatement implements Expr {
     }
 
     @Override
-    public int eval(Map<String, Integer> bindings) throws EvalError {
+    public int eval(Map<String, Integer> bindings) throws EvalError, IOException, ActionCmd.ParsingInterruptedException {
         int result = 0; // Default value for block statement
-//        for (Expr statement : statements) {
-//            result = statement.eval(bindings);
-//        }
+        for (Expr statement : statements) {
+            result = statement.eval(bindings);
+        }
         return result;
     }
 
     @Override
-    public void prettyPrint(StringBuilder s) {
+    public void prettyPrint(StringBuilder s) throws EvalError {
         s.append("{\n");
         for (Expr statement : statements) {
             s.append("  ");
