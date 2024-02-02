@@ -142,7 +142,6 @@ class ActionCommands implements ActionCmd {
                 c.setCitycenter(false);
                 c.setP(new Player());
             }
-            System.out.println("colloect was do");
         }catch (ParsingInterruptedException e) {
             System.out.println("fail to collect, end turn.");
 

@@ -26,7 +26,7 @@ public class Player {
         this.id = id;
         bindings.put("budget",(int) r.initBudget());
         this.cityCrew = new CityCrew(-1,-1,this);
-        bindings.put("t", 1);
+        bindings.put("t", 0);
         bindings.put("deposit",1000);
         bindings.put("m", 0);
         bindings.put("opponentLoc", 0);

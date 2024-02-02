@@ -20,7 +20,6 @@ public class ConstructionPlanReader {
             e.printStackTrace();
             throw new IOException();
         }
-        System.out.println(constructionPlanCode.toString());
         return constructionPlanCode.toString();
     }
 }

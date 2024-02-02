@@ -166,6 +166,7 @@ record RegionCommand(String cmd,Expr expression,Player p, land l) implements Exp
     public int eval(Map<String, Integer> bindings) throws EvalError, IOException, ActionCmd.ParsingInterruptedException {
         if(cmd.equals("invest")) {
             a.invest(expression.eval(bindings), p, l.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()));
+            bindings.put("deposit",l.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getDeposit());
             return 1;
         } else if (cmd.equals("collect")) {
             a.collect(expression.eval(bindings), p, l.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()));
