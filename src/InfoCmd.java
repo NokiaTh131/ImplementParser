@@ -28,7 +28,6 @@ class InfoCommand implements InfoCmd {
         String yS = Integer.toString(packOfD_d[1]);
         int y = yS.length();
         int distance = packOfD_d[0];
-        System.out.println(y);
         if(distance == 0) return 0;
         String loc = Integer.toString(distance);//get string
         String x = loc.substring(0, loc.length() - 1);//get substring except last char
@@ -60,7 +59,7 @@ class InfoCommand implements InfoCmd {
                     initial_up_number += 10;
                     int id = w.getCell(loc[0],loc[1]).getPlayer_Id();
                     if(id != p.getId() && id != 0) {
-                        y = w.getCell(loc[0],loc[1]).getDeposit();
+                        y = (int) w.getCell(loc[0],loc[1]).getDeposit();
                         packOfD_and_d[0] = initial_up_number;
                         packOfD_and_d[1] = y;
                         return packOfD_and_d;
@@ -74,7 +73,7 @@ class InfoCommand implements InfoCmd {
                     initial_upleft_number += 10;
                     int id = w.getCell(loc[0], loc[1]).getPlayer_Id();
                     if (id != p.getId() && id != 0) {
-                        y = w.getCell(loc[0],loc[1]).getDeposit();
+                        y = (int) w.getCell(loc[0],loc[1]).getDeposit();
                         packOfD_and_d[0] = initial_upleft_number;
                         packOfD_and_d[1] = y;
                         return packOfD_and_d;
@@ -88,7 +87,7 @@ class InfoCommand implements InfoCmd {
                     initial_upright_number += 10;
                     int id = w.getCell(loc[0], loc[1]).getPlayer_Id();
                     if (id != p.getId() && id != 0) {
-                        y = w.getCell(loc[0],loc[1]).getDeposit();
+                        y = (int) w.getCell(loc[0],loc[1]).getDeposit();
                         packOfD_and_d[0] = initial_upright_number;
                         packOfD_and_d[1] = y;
                         return packOfD_and_d;
@@ -102,7 +101,7 @@ class InfoCommand implements InfoCmd {
                     initial_downright_number += 10;
                     int id = w.getCell(loc[0], loc[1]).getPlayer_Id();
                     if (id != p.getId() && id != 0) {
-                        y = w.getCell(loc[0],loc[1]).getDeposit();
+                        y = (int) w.getCell(loc[0],loc[1]).getDeposit();
                         packOfD_and_d[0] = initial_downright_number;
                         packOfD_and_d[1] = y;
                         return packOfD_and_d;
@@ -116,7 +115,7 @@ class InfoCommand implements InfoCmd {
                     initial_down_number += 10;
                     int id = w.getCell(loc[0],loc[1]).getPlayer_Id();
                     if(id != p.getId() && id != 0) {
-                        y = w.getCell(loc[0],loc[1]).getDeposit();
+                        y = (int) w.getCell(loc[0],loc[1]).getDeposit();
                         packOfD_and_d[0] = initial_down_number;
                         packOfD_and_d[1] = y;
                         return packOfD_and_d;
@@ -130,7 +129,7 @@ class InfoCommand implements InfoCmd {
                     initial_downleft_number += 10;
                     int id = w.getCell(loc[0], loc[1]).getPlayer_Id();
                     if (id != p.getId() && id != 0) {
-                        y = w.getCell(loc[0],loc[1]).getDeposit();
+                        y = (int) w.getCell(loc[0],loc[1]).getDeposit();
                         packOfD_and_d[0] = initial_downleft_number;
                         packOfD_and_d[1] = y;
                         return packOfD_and_d;
@@ -143,25 +142,6 @@ class InfoCommand implements InfoCmd {
         packOfD_and_d[0] = 0;
         packOfD_and_d[1] = 0;
         return packOfD_and_d;
-
-    }
-    public static void main(String[] args) throws IOException {
-        List<Player> players = new ArrayList<>();
-        land l = new land(players);
-        InfoCommand i = new InfoCommand();
-        Player p = new Player("John",10);
-        Player p2 = new Player("Ksdf",88);
-        l.buyCity(3,4,p,1000);
-        p.setCityCrewLoc(3,4);
-        l.buyCity(1,4,p2,100000);
-        l.buyCity(2,2,p2,2000);
-        l.buyCity(4,2,p2,2000);
-        l.buyCity(5,4,p2,2000);
-        l.buyCity(4,6,p2,2000);
-        l.buyCity(2,6,p2,2000);
-        int y = i.opponent(p,l);
-        l.printMatrix();
-        System.out.println("closest direction number is " + y);
 
     }
 }

@@ -2,7 +2,7 @@ import java.io.IOException;
 
 public class Cell{
     private Player p;
-    private int deposit;
+    private double deposit;
     private boolean isCitycenter = false;
     private long row;
     private long col;
@@ -22,7 +22,7 @@ public class Cell{
 
     }
 
-    public int getDeposit() {
+    public double getDeposit() {
         if(p.getId() == 0) return -deposit;
         return deposit;
     }
@@ -37,7 +37,7 @@ public class Cell{
 
     }
 
-    public void setDeposit(int deposit) {
+    public void setDeposit(double deposit) {
         this.deposit = deposit;
     }
 

@@ -45,7 +45,7 @@ public class WeightedGraph {
     public void printGraphMatrix() {
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
-                int deposit = adjacencyMatrix[i][j].getDeposit();
+                double deposit = adjacencyMatrix[i][j].getDeposit();
                 if (deposit <= 0) {
                     System.out.print("0\t");
                 } else {

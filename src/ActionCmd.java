@@ -44,51 +44,51 @@ class ActionCommands implements ActionCmd {
             if(p.getBudget() < 1) done();
             switch (direction) {
                 case UP:
+                    if(p.getCityCrew().getCurrentRow() == 0) return false;
                     p.getCityCrew().moveUp();
                     if(p.getCityCrew().getPlayer_Id() != w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id()
                             && w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id() != 0) {
                         p.getCityCrew().moveDown();
-                        System.out.println("found opponent!");
                         return true;}
                     break;
                 case UPLEFT:
+                    if(p.getCityCrew().getCurrentRow() == 0 || p.getCityCrew().getCurrentCol() == 0) return false;
                     p.getCityCrew().moveUpLeft();
                     if(p.getCityCrew().getPlayer_Id() != w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id()
                             && w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id() != 0) {
                         p.getCityCrew().moveDownRight();
-                        System.out.println("found opponent!");
                         return true;}
                     break;
                 case UPRIGHT:
+                    if(p.getCityCrew().getCurrentRow() == 0 || p.getCityCrew().getCurrentCol() == p.bindings.get("cols") - 1) return false;
                     p.getCityCrew().moveUpRight();
                     if(p.getCityCrew().getPlayer_Id() != w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id()
                             && w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id() != 0) {
                         p.getCityCrew().moveDownLeft();
-                        System.out.println("found opponent!");
                         return true;}
                     break;
                 case DOWNRIGHT:
+                    if(p.getCityCrew().getCurrentRow() == p.bindings.get("rows") - 1 || p.getCityCrew().getCurrentCol() == p.bindings.get("cols") - 1) return false;
                     p.getCityCrew().moveDownRight();
                     if(p.getCityCrew().getPlayer_Id() != w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id()
                             && w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id() != 0) {
                         p.getCityCrew().moveUpLeft();
-                        System.out.println("found opponent!");
                         return true;}
                     break;
                 case DOWN:
+                    if(p.getCityCrew().getCurrentRow() == p.bindings.get("rows") - 1) return false;
                     p.getCityCrew().moveDown();
                     if(p.getCityCrew().getPlayer_Id() != w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id()
                             && w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id() != 0) {
                         p.getCityCrew().moveUp();
-                        System.out.println("found opponent!");
                         return true;}
                     break;
                 case DOWNLEFT:
+                    if(p.getCityCrew().getCurrentRow() == p.bindings.get("rows") - 1 || p.getCityCrew().getCurrentCol() == 0) return false;
                     p.getCityCrew().moveDownLeft();
                     if(p.getCityCrew().getPlayer_Id() != w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id()
                             && w.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getPlayer_Id() != 0) {
                         p.getCityCrew().moveUpRight();
-                        System.out.println("found opponent!");
                         return true;}
                     break;
                 default:
@@ -113,15 +113,17 @@ class ActionCommands implements ActionCmd {
         }
         ConfigurationReader r = new ConfigurationReader();
 
-        int newDeposit = Math.min(c.getDeposit() + money, (int) r.maxDep());
+        double newDeposit = Math.min(c.getDeposit() + money, (int) r.maxDep());
         c.setDeposit(newDeposit);
         //set new player budget
         p.setBudget(Math.max(p.getBudget() - money,0));
 
         c.setP(p);
+//        System.out.println(p.getName() + " invest " + money);
     }
 
     public void collect(int amount, Player player, Cell c) throws IOException, ParsingInterruptedException {
+//        System.out.println(player.getName() +" before collect dp " + c.getDeposit());
         // The cost of the collect command is 1 unit
         int Cost = 1;
         player.setBudget(Math.max(player.getBudget() - Cost, 0));
@@ -137,11 +139,13 @@ class ActionCommands implements ActionCmd {
 
             c.setDeposit(c.getDeposit() - amount);
             player.setBudget(player.getBudget() + amount);
-
-            if (c.getDeposit() == 0) {
+            if (c.getDeposit() <= 0) {
+                System.out.println(player.getName() +" lost Cell");
                 c.setCitycenter(false);
                 c.setP(new Player());
             }
+//            System.out.println(player.getName() +" collect " + amount);
+//            System.out.println(player.getName() +" budget " + player.getBudget());
         }catch (ParsingInterruptedException e) {
             System.out.println("fail to collect, end turn.");
 
@@ -156,14 +160,16 @@ class ActionCommands implements ActionCmd {
         if (p1.getBudget() < shootCost) {
             return;//no-op
         }
+//        System.out.println(p1.getName() + " have " + p1.getBudget());
         p1.setBudget(p1.getBudget() - shootCost);
         int[] loc = directPeek(d,p1.getCityCrew().getCurrentRow(),p1.getCityCrew().getCurrentCol());
-        System.out.println(p1.getName() + " aim at " + l.getCell(loc[0],loc[1]).getP().getName());
+        System.out.println(p1.getName() + " shoot " + p1.bindings.get("cost") + " at " + l.getCell(loc[0],loc[1]).getP().getName());
 
         // Calculate the new deposit after the attack
 
-        int newDeposit = Math.max(0, l.getCell(loc[0],loc[1]).getDeposit() - money);
+        double newDeposit = Math.max(0, l.getCell(loc[0],loc[1]).getDeposit() - money);
         l.getCell(loc[0],loc[1]).setDeposit(newDeposit);
+        System.out.println(l.getCell(loc[0],loc[1]).getP().getName() + " left " + l.getCell(loc[0],loc[1]).getDeposit());
         if (newDeposit < 1) {
             if(l.getCell(loc[0],loc[1]).isCitycenter()) {
                 handlePlayerLoss(l.getCell(loc[0],loc[1]), l);
@@ -252,7 +258,7 @@ class ActionCommands implements ActionCmd {
         for(int i = 0;i < l.map.row;i++) {
             for(int j = 0;j < l.map.col;j++) {
                 if(lp.getId() == (l.getCell(i, j).getP().getId())) {
-                    int oldDeposit = l.getCell(i,j).getDeposit();
+                    double oldDeposit = l.getCell(i,j).getDeposit();
                     l.getCell(i,j).setP(new Player());
                     l.getCell(i,j).setDeposit(oldDeposit);
                 }
@@ -261,29 +267,4 @@ class ActionCommands implements ActionCmd {
 
     }
 
-    public static void main(String[] args) throws IOException, ParsingInterruptedException {
-        // Assuming you have a land instance 'w' and a player instance 'p1'
-        List<Player> players = new ArrayList<>();
-        land w = new land(players);
-
-        Player p1 = new Player("Gojo", 99);
-        Player p2 = new Player("Gege", 12);
-        w.buyCity(3, 2, p1, 1202);
-        w.buyCity(4, 2, p2, 999);
-        ActionCommands a = new ActionCommands();
-        a.move(Direction.UP,p1,w);
-        a.invest(100,p1,w.getCell(p1.getCityCrew().getCurrentRow(),p1.getCityCrew().getCurrentCol()));
-        a.move(Direction.UP,p1,w);
-        a.invest(100,p1,w.getCell(p1.getCityCrew().getCurrentRow(),p1.getCityCrew().getCurrentCol()));
-        a.invest(100,p1,w.getCell(p1.getCityCrew().getCurrentRow(),p1.getCityCrew().getCurrentCol()));
-        a.invest(100,p1,w.getCell(p1.getCityCrew().getCurrentRow(),p1.getCityCrew().getCurrentCol()));
-        a.move(Direction.UP,p2,w);
-        a.invest(100,p2,w.getCell(p2.getCityCrew().getCurrentRow(),p2.getCityCrew().getCurrentCol()));
-
-        w.printMatrix();
-        w.printOwner(p1);
-        w.printOwner(p2);
-
-
-    }
 }

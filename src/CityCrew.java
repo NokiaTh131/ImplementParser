@@ -1,21 +1,16 @@
 public class CityCrew {
-    private int currentRow;
-    private int currentCol;
     private Player p;
-    private Cell curCell;
 
-    public CityCrew(int row, int col, Player p) {
-        this.currentRow = row;
-        this.currentCol = col;
+    public CityCrew(Player p) {
         this.p = p;
     }
 
     public int getCurrentRow() {
-        return currentRow;
+        return p.bindings.get("currow");
     }
 
     public int getCurrentCol() {
-        return currentCol;
+        return p.bindings.get("curcol");
     }
 
     public int getPlayer_Id() {
@@ -23,64 +18,56 @@ public class CityCrew {
     }
 
     public void moveUp() {
-        currentRow--;
+        p.bindings.put("currow",p.bindings.get("currow") - 1);
     }
 
     public void moveUpLeft() {
-        if (currentCol % 2 == 0) {
-            currentRow--;
-            currentCol--;
+        if (getCurrentCol() % 2 == 0) {
+            p.bindings.put("currow",p.bindings.get("currow") - 1);
+            p.bindings.put("curcol",p.bindings.get("curcol") - 1);
             return;
         }
-        if(currentCol % 2 == 1){
-            currentCol--;
+        if(getCurrentCol() % 2 == 1){
+            p.bindings.put("curcol",p.bindings.get("curcol") - 1);
         }
     }
 
     public void moveUpRight() {
-        if (currentCol % 2 == 0) {
-            currentRow--;
-            currentCol++;
+        if (getCurrentCol() % 2 == 0) {
+            p.bindings.put("currow",p.bindings.get("currow") - 1);
+            p.bindings.put("curcol",p.bindings.get("curcol") + 1);
             return;
         }
-        if(currentCol % 2 == 1){
-            currentCol++;
+        if(getCurrentCol() % 2 == 1){
+            p.bindings.put("curcol",p.bindings.get("curcol") + 1);
         }
     }
 
     public void moveDownRight() {
-        if (currentCol % 2 == 0) {
-            currentCol++;
+        if (getCurrentCol() % 2 == 0) {
+            p.bindings.put("curcol",p.bindings.get("curcol") + 1);
             return;
         }
-        if(currentCol % 2 == 1){
-            currentCol++;
-            currentRow++;
+        if(getCurrentCol() % 2 == 1){
+            p.bindings.put("curcol",p.bindings.get("curcol") + 1);
+            p.bindings.put("currow",p.bindings.get("currow") + 1);
         }
     }
 
     public void moveDown() {
-        currentRow++;
-
+        p.bindings.put("currow",p.bindings.get("currow") + 1);
     }
 
     public void moveDownLeft() {
-        if (currentCol % 2 == 0) {
-            currentCol--;
+        if (getCurrentCol() % 2 == 0) {
+            p.bindings.put("curcol",p.bindings.get("curcol") - 1);
             return;
         }
-        if(currentCol % 2 == 1){
-            currentCol--;
-            currentRow++;
+        if(getCurrentCol() % 2 == 1){
+            p.bindings.put("curcol",p.bindings.get("curcol") - 1);
+            p.bindings.put("currow",p.bindings.get("currow") + 1);
         }
     }
 
-    public void setCurrentRow(int currentRow) {
-        this.currentRow = currentRow;
-    }
-
-    public void setCurrentCol(int currentCol) {
-        this.currentCol = currentCol;
-    }
 
 }

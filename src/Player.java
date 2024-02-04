@@ -19,23 +19,33 @@ public class Player {
     private Variable cost = new Variable("cost");
     private Variable dir = new Variable("dir");
     private Variable random = new Variable("random");
+    private Variable currow = new Variable("currow");
+    private Variable curcol = new Variable("curcol");
+    private Variable rows = new Variable("rows");
+    private Variable cols = new Variable("cols");
+    private Variable interest = new Variable("int");
+    private Variable interest_base = new Variable("interest_pct");
+    private Variable maxdp = new Variable("max_dep");
+
 
     public Player(String name, int id) throws IOException {
         ConfigurationReader r = new ConfigurationReader();
+        bindings.put("rows", (int)r.m());
+        bindings.put("cols", (int)r.n());
         this.name = name;
         this.id = id;
         bindings.put("budget",(int) r.initBudget());
-        this.cityCrew = new CityCrew(-1,-1,this);
+        this.cityCrew = new CityCrew(this);
         bindings.put("t", 0);
         bindings.put("deposit",1000);
         bindings.put("m", 0);
         bindings.put("opponentLoc", 0);
         bindings.put("cost", 0);
         bindings.put("dir", 0);
-
-        Random rand = new Random();
-        int randomValue = rand.nextInt(1000);
-        bindings.put("random",randomValue );
+        bindings.put("random",0 );
+        bindings.put("int",10000);
+        bindings.put("interest_pct",(int)r.interestPct());
+        bindings.put("max_dep",(int)r.maxDep());
     }
     public Player() throws IOException {
         this("N/A",0);
@@ -81,8 +91,9 @@ public class Player {
     }
 
     public void setCityCrewLoc(int row,int col) {
-        this.cityCrew.setCurrentRow(row);
-        this.cityCrew.setCurrentCol(col);
+        bindings.put("currow", row);
+        bindings.put("curcol", col);
     }
+
 }
 

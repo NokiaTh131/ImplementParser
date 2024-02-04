@@ -34,7 +34,6 @@ class ExprParser implements Parser {
         List<Expr> statements = new ArrayList<>();
         while (tkz.hasNextToken()) {
             Expr statement = parseStatement();
-            System.out.println(p.getBudget());
             statements.add(statement);
         }
         return statements;
@@ -53,7 +52,6 @@ class ExprParser implements Parser {
     }
 
     public Expr parseBlockStatement() throws SyntaxError, EvalError {
-//        System.out.println("parseBlock");
         tkz.consume("{");
         List<Expr> statements = new ArrayList<>();
         while (!tkz.peek("}")) {
@@ -66,7 +64,6 @@ class ExprParser implements Parser {
 
     // Command → AssignmentStatement | ActionCommand
     public Expr parseCommand() throws SyntaxError, EvalError {
-//        System.out.println("parseCmd");
         if (tkz.peek("done") || tkz.peek("relocate")|| tkz.peek("move")
                 || tkz.peek("invest") || tkz.peek("collect") || tkz.peek("shoot")) {
             return parseActionCommand();
@@ -79,7 +76,7 @@ class ExprParser implements Parser {
         String identifier = tkz.consume();
         tkz.consume("=");
         Expr expression = parseExpression();
-        return new AssignmentExpr(identifier, expression);
+        return new AssignmentExpr(identifier, expression,p,l);
     }
 
     public Expr parseActionCommand() throws SyntaxError, EvalError {
@@ -99,14 +96,12 @@ class ExprParser implements Parser {
     }
 
     public Expr parseMoveCommand() throws SyntaxError {
-//        System.out.println("parseMove");
         tkz.consume("move"); // Consume the "move" keyword
         Direction direction = parseDirection(); // Parse the direction
         return new MoveCommand(direction,p ,l);
     }
 
     private Expr parseRegionCommand() throws SyntaxError, EvalError {
-//        System.out.println("parseRegion");
         if (tkz.peek("invest")) {
             tkz.consume("invest"); // Consume the "invest" keyword
             Expr expression = parseExpression(); // Parse the investment expression
@@ -128,7 +123,6 @@ class ExprParser implements Parser {
     }
 
     private Direction parseDirection() throws SyntaxError {
-//        System.out.println("parseDirection");
         if (tkz.peek("up")) {
             tkz.consume("up");
             return Direction.UP;
@@ -153,7 +147,6 @@ class ExprParser implements Parser {
     }
 
     private Expr parseIfStatement() throws SyntaxError, EvalError {
-//        System.out.println("parseIf");
         tkz.consume("if");
         tkz.consume("(");
         Expr condition = parseExpression();
@@ -166,7 +159,6 @@ class ExprParser implements Parser {
     }
 
     public Expr parseWhileStatement() throws SyntaxError, EvalError {
-//        System.out.println("parseWhile");
         tkz.consume("while");
         tkz.consume("(");
         Expr condition = parseExpression();
@@ -176,7 +168,6 @@ class ExprParser implements Parser {
     }
 
     private Expr parseExpression() throws SyntaxError, EvalError {
-//        System.out.println("parseExpression");
         Expr left = parseTerm();
         while (tkz.peek("+")) {
             tkz.consume();
@@ -190,7 +181,6 @@ class ExprParser implements Parser {
     }
 
     private Expr parseTerm() throws Parser.SyntaxError, EvalError {
-//        System.out.println("parseTerm");
         Expr left = parseFactor();
         while (tkz.peek("/") || tkz.peek("%") || tkz.peek("*")) {
             if(tkz.peek("/")) {
@@ -209,7 +199,6 @@ class ExprParser implements Parser {
     }
 
     private Expr parseFactor() throws Parser.SyntaxError, EvalError {
-//        System.out.println("parseFactor");
         Expr l = parsePower();
         while (tkz.peek("^")) {
             tkz.consume("^");
@@ -219,7 +208,6 @@ class ExprParser implements Parser {
     }
 
     public Expr parsePower() throws Parser.SyntaxError, EvalError {
-//        System.out.println("parsePower");
         String[] reservedWords = {"collect", "done", "down", "downleft", "downright",
                 "else", "if", "invest", "move", "nearby", "opponent",
                 "relocate", "shoot", "then", "up", "upleft", "upright", "while"};
@@ -237,7 +225,6 @@ class ExprParser implements Parser {
         }
     }
     private Expr parseInfoExpression() throws SyntaxError {
-//        System.out.println("parseInfo");
         if (tkz.peek("opponent")) {
             tkz.consume("opponent");
             return new OpponentInfoExpr(p,l);

@@ -3,7 +3,7 @@ import java.util.List;
 
 
 public interface Territory {
-    void buyCity(int row, int col, Player p, int deposit);
+    void buyCity(int row, int col, Player p) throws IOException;
     Cell getCell(int row, int col);
     int getIndexOfPlayer(Player p, List<Player> playerList);
 }
@@ -18,9 +18,10 @@ class land implements Territory {
         this.players = players;
     }
 
+    //spec : buycity is invoked only first time game is started for set player initial random cell
     @Override
-    public void buyCity(int row, int col, Player p, int deposit) {
-        map.addEdge(row,col,p,deposit);
+    public void buyCity(int row, int col, Player p) throws IOException {
+        map.addEdge(row,col,p,(int)c.initCenterDep());
         p.setCityCenter(this.getCell(row,col));
         p.setCityCrewLoc(row,col);
     }

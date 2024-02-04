@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 interface Node {
     void prettyPrint(StringBuilder s) throws EvalError;
@@ -29,7 +30,14 @@ record IntLit(int val) implements Expr {
 
 record Variable(String name) implements Expr {
     public int eval(Map<String, Integer> bindings) throws EvalError {
-        if (bindings.containsKey(name)) return bindings.get(name);
+        if (bindings.containsKey(name)) {
+            if(name.equals("random")) {
+                Random rand = new Random();
+                int randomValue = rand.nextInt(1000);
+                bindings.put("random",randomValue);
+            }
+            return bindings.get(name);
+        }
         throw new EvalError("undefined variable: " + name);
     }
     public void prettyPrint(StringBuilder s) {
@@ -108,7 +116,6 @@ record WhileStatement(Expr condition, Expr body) implements Expr {
 record ActionCommand(String cmd,Player p,land l) implements Expr {
     public int eval(Map<String, Integer> bindings) throws EvalError, IOException, ActionCmd.ParsingInterruptedException {
             if (cmd.equals("done")) {
-                System.out.println("done was do");
                 a.done();
                 return 1;
             } else if (cmd.equals("relocate")) {
@@ -154,7 +161,8 @@ record IfStatement(Expr condition, Expr thenBranch,Expr elseBranch) implements E
 record AttackCommand(Direction direction,Expr expression,Player p,land l) implements Expr {
 
     public int eval(Map<String, Integer> bindings) throws EvalError, IOException, ActionCmd.ParsingInterruptedException {
-        a.shoot(direction, expression.eval(bindings), p, l);
+        int cost = expression.eval(bindings);
+        a.shoot(direction, cost, p, l);
         return 1;
     }
     public void prettyPrint(StringBuilder s) {
@@ -166,10 +174,11 @@ record RegionCommand(String cmd,Expr expression,Player p, land l) implements Exp
     public int eval(Map<String, Integer> bindings) throws EvalError, IOException, ActionCmd.ParsingInterruptedException {
         if(cmd.equals("invest")) {
             a.invest(expression.eval(bindings), p, l.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()));
-            bindings.put("deposit",l.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getDeposit());
+            bindings.put("deposit",(int)l.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getDeposit());
             return 1;
         } else if (cmd.equals("collect")) {
             a.collect(expression.eval(bindings), p, l.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()));
+            bindings.put("deposit",(int) l.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getDeposit());
             return 2;
         }else{
             throw new EvalError("Invalid region command: " + cmd);
@@ -183,9 +192,8 @@ record RegionCommand(String cmd,Expr expression,Player p, land l) implements Exp
 
 record MoveCommand(Direction direction, Player p, land l) implements Expr {
     public int eval(Map<String, Integer> bindings) throws EvalError, ActionCmd.ParsingInterruptedException {
-        System.out.println("move was do");
         a.move(direction,p,l);
-        bindings.put("deposit",l.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getDeposit());
+        bindings.put("deposit",(int) l.getCell(p.getCityCrew().getCurrentRow(),p.getCityCrew().getCurrentCol()).getDeposit());
         return 1;
     }
     public void prettyPrint(StringBuilder s) {
@@ -195,11 +203,29 @@ record MoveCommand(Direction direction, Player p, land l) implements Expr {
 }
 
 
-record AssignmentExpr(String identifier,Expr expression) implements Expr {
+record AssignmentExpr(String identifier,Expr expression,Player p ,land l) implements Expr {
     public int eval(Map<String, Integer> bindings) throws EvalError, IOException, ActionCmd.ParsingInterruptedException {
         if (expression != null) {
             int value = expression.eval(bindings);
             bindings.put(identifier, value);
+            if(identifier.equals("t")) {
+                //make new deposit for all cell belong to this player and increased by int
+                double r = 0;
+                double interestRate = 0;
+                for (int i = 0; i < bindings.get("rows"); i++) {
+                    for (int j = 0; j < bindings.get("cols"); j++) {
+                        int pId = l.getCell(i,j).getPlayer_Id();
+                        if (pId == p.getId()) {
+                            r = bindings.get("interest_pct") * Math.log10(l.getCell(i,j).getDeposit()) * Math.log(value);
+                            interestRate = l.getCell(i,j).getDeposit() * r/100;
+//                            System.out.println("interest rate " + value + " turn " + interestRate);
+                            bindings.put("int",(int) l.getCell(i,j).getDeposit() * (int)r/100);
+                            l.getCell(i,j).setDeposit(Math.min(l.getCell(i,j).getDeposit() + interestRate,bindings.get("max_dep")));
+//                            System.out.println("player deposit " + l.getCell(i,j).getDeposit());
+                        }
+                    }
+                }
+            }
             return value;
         } else {
             throw new EvalError("Missing expression in assignment");
